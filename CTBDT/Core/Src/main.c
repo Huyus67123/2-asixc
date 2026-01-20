@@ -645,10 +645,10 @@ void DrawRectangle(float a, float b){
 	GoLinerY(b);
 	WaitY();
 
-	GoLinerX(-a);
+	GoLinerX(0);
 	WaitX();
 
-	GoLinerY(-b);
+	GoLinerY(0);
 	WaitY();
 }
 void DrawCircle(float r)
@@ -724,15 +724,20 @@ void DrawCircle(float r)
 //}
 
 void DrawStar(){
-	GoDiagonal(2,4);
+	GoDiagonal(1,1);
+	Hal_Delay(1);
+	
+	GoDiagonal(3,5);
+	Hal_Delay(1);
 
-	GoDiagonal(2,-4);
+	GoDiagonal(5,1);
+	Hal_Delay(1);
 
-	GoDiagonal(-4,2);
-
-	GoLinerX(4);
-	WaitX();
-	GoDiagonal(-4,-2);
+	GoDiagonal(1,4);
+	Hal_Delay(1);
+	
+	GoDiagonal(4,5);
+	Hal_Delay(1);
 
 }
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
