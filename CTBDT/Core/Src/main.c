@@ -35,6 +35,8 @@ volatile uint8_t x_done = 0;
 volatile uint8_t y_done = 0;
 volatile float x_pre = 0;
 volatile float y_pre = 0;
+volatile int endX=0;
+volatile int endY=0;
 char rxByte=0;
 /* USER CODE END PTD */
 
@@ -466,11 +468,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
-	if(GPIO_Pin==GPIO_PIN_6){
-		HAL_GPIO_WritePin(ENA1_GPIO_Port, ENA1_Pin, GPIO_PIN_SET);
+	if(GPIO_Pin==StopX_Pin){
+		endX=1;
 	}
-	if(GPIO_Pin==GPIO_PIN_7){
-		HAL_GPIO_WritePin(ENA2_GPIO_Port, ENA2_Pin, GPIO_PIN_SET);
+	if(GPIO_Pin==StopY_Pin){
+		endY=1;
 	}
 
 	if(GPIO_Pin == button1_Pin){
@@ -704,65 +706,23 @@ void DrawCircle(float r)
 }
 
 
-//void DrawCircle(float r){
-//  // vi du tam duong tron (4, 4) cm ban kinh 1 cm
-//  float Ix = 4; // toa do x tam duong tron
-//  float Iy = 4; // toa do y tam duong tron
-//  float radius = r; // ban kinh
-//
-//	GoLinerX(4.0);
-//	GoLinerY(4.0);
-//	WaitX();
-//
-//  float minX = Ix - radius;
-//  float maxX = Ix + radius;
-//  const float step = 0.01;
-//  const float a = 1;
-//  float constant = Ix*Ix + Iy*Iy - radius*radius;
-//  float currX = minX;
-//
-//  while (currX < maxX) {
-//    float b = -2*Iy;
-//    float c = currX*currX - 2*Ix*currX + constant;
-//    float delta = b*b - 4*a*c;
-//    float y1 = (-b + sqrtf(delta)) / 2*a;
-//    GoLinerX(currX);
-//    GoLinerY(y1);
-//    WaitX();
-//    WaitY();
-//    currX += step;
-//  }
-//
-//  currX = minX;
-//
-//  while (currX < maxX) {
-//    float b = -2*Iy;
-//    float c = currX*currX - 2*Ix*currX + constant;
-//    float delta = b*b - 4*a*c;
-//    float y2 = (-b - sqrtf(delta)) / 2*a;
-//    GoLinerX(currX);
-//    GoLinerY(y2);
-//    WaitX();
-//    WaitY();
-//    currX += step;
-//  }
-//}
+
 
 void DrawStar(){
 	GoDiagonal(1,1);
-	Hal_Delay(1);
+	HAL_Delay(1);
 	
 	GoDiagonal(3,5);
-	Hal_Delay(1);
+	HAL_Delay(1);
 
 	GoDiagonal(5,1);
-	Hal_Delay(1);
+	HAL_Delay(1);
 
 	GoDiagonal(1,4);
-	Hal_Delay(1);
+	HAL_Delay(1);
 	
 	GoDiagonal(4,5);
-	Hal_Delay(1);
+	HAL_Delay(1);
 
 }
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
