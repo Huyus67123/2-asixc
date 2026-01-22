@@ -144,21 +144,25 @@ int main(void)
 		  case DRAW_CIRCLE:
 			  GoHome();
 			  DrawCircle(3);
+			  HAL_Delay(1);
 			  current_mode = IDLE;
 			  break;
 		  case DRAW_SQUARE:
 			  GoHome();
 			  DrawSquar(3);
+			  HAL_Delay(1);
 			  current_mode = IDLE;
 			  break;
 		  case DRAW_RECTANGLE:
 			  GoHome();
 			  DrawRectangle(3,4);
+			  HAL_Delay(1);
 			  current_mode = IDLE;
 			  break;
 		  case DRAW_START:
 			  GoHome();
 			  DrawStar();
+			  HAL_Delay(1);
 			  current_mode = IDLE;
 			  break;
 		  default:
@@ -749,6 +753,9 @@ void DrawStar(){
 	HAL_Delay(1);
 	
 	GoDiagonal(4,5);
+	HAL_Delay(1);
+
+	GoDiagonal(1,1);
 	HAL_Delay(1);
 
 }
