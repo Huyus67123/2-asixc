@@ -89,6 +89,7 @@ void GoDiagonal(float x, float y);
 void DrawSquar(float a);
 void DrawRectangle(float a, float b);
 void DrawCircle(float a);
+void DrawStar();
 /* USER CODE END 0 */
 
 /**
@@ -127,17 +128,6 @@ int main(void)
   HAL_GPIO_WritePin(ENA1_GPIO_Port, ENA1_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(ENA2_GPIO_Port, ENA2_Pin, GPIO_PIN_SET);
 
-  void printf_uart(const char *str);
-//  DrawRectangle(2, 1);
-//  GoDiagonal(4, 4);
-//  DrawSquar(4);
-
-//  GoHome();
-//  DrawStar();
-//  DrawCircle(2);
-  GoDiagonal(2.0,1.0);
-//  GoLinerY(-7.5);
-//  GoLinerX(-7.5);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -147,13 +137,34 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  //DrawSquar(5);
-//	  if(done==1){
-//		  printf_uart("chon hinh\n");
-//		  printf_uart("1.vuong\n");
-//		  printf_uart("2.chu nhat\n");
-//		  printf_uart("3.ngoi sao\n");
-//	  }
+//	  HAL_Delay(200);
+//		  GoHome();
+//	  HAL_Delay(200);
+	  switch(current_mode){
+		  case DRAW_CIRCLE:
+			  GoHome();
+			  DrawCircle(3);
+			  current_mode = IDLE;
+			  break;
+		  case DRAW_SQUARE:
+			  GoHome();
+			  DrawSquar(3);
+			  current_mode = IDLE;
+			  break;
+		  case DRAW_RECTANGLE:
+			  GoHome();
+			  DrawRectangle(3,4);
+			  current_mode = IDLE;
+			  break;
+		  case DRAW_START:
+			  GoHome();
+			  DrawStar();
+			  current_mode = IDLE;
+			  break;
+		  default:
+			  break;
+	  }
+
   }
   /* USER CODE END 3 */
 }
@@ -444,17 +455,7 @@ void WaitY() {
 	y_done = 0;
 }
 
-void WaitXint(int step){
-	while (x_go!=step){
-		HAL_Delay(1);
-	}
-}
 
-void WaitYint(int step){
-	while (y_go!=step){
-		HAL_Delay(1);
-	}
-}
 
 void printf_uart(const char *mess) {
     HAL_UART_Transmit(&huart1, (uint8_t *)mess, strlen(mess), 500);
@@ -607,30 +608,48 @@ void GoDiagonal(float x, float y)
         return;
     }
 
+    // ⚡ TÍNH TỈ LỆ VÀ TỐC ĐỘ CHUẨN
     float sx = fabs(dx);
     float sy = fabs(dy);
 
-    uint32_t baseARR = 1000;
-    uint32_t arrX = baseARR;
-    uint32_t arrY = baseARR;
+    // Tốc độ cơ bản (có thể điều chỉnh)
+    float baseSpeed = 1000.0f;  // Hz
 
-    float maxS = (sx > sy) ? sx : sy;
-    arrX = (uint32_t)(baseARR * maxS / sx);
-    arrY = (uint32_t)(baseARR * maxS / sy);
+    // Tính tốc độ cho từng trục dựa trên tỉ lệ
+    // Trục có quãng đường nhỏ hơn sẽ chạy chậm hơn theo tỉ lệ
+    float speedX, speedY;
 
-    // Giới hạn
+    if (sx >= sy) {
+        // X là trục dài hơn -> X chạy với tốc độ base
+        speedX = baseSpeed;
+        speedY = baseSpeed * (sy / sx);  // Y chậm hơn theo tỉ lệ
+    } else {
+        // Y là trục dài hơn -> Y chạy với tốc độ base
+        speedY = baseSpeed;
+        speedX = baseSpeed * (sx / sy);  // X chậm hơn theo tỉ lệ
+    }
+
+    // Chuyển đổi tốc độ sang ARR (ARR = Timer_Clock / Frequency)
+    // ARR càng nhỏ = tần số càng cao = tốc độ càng nhanh
+    uint32_t arrX = (uint32_t)(baseSpeed * 1000.0f / speedX);
+    uint32_t arrY = (uint32_t)(baseSpeed * 1000.0f / speedY);
+
+    // Giới hạn an toàn
     if (arrX < 200) arrX = 200;
     if (arrY < 200) arrY = 200;
     if (arrX > 5000) arrX = 5000;
     if (arrY > 5000) arrY = 5000;
 
+    // Cài đặt PWM
     PWM_SetARR_Pulse(&htim1, arrX, TIM_CHANNEL_1);
     PWM_SetARR_Pulse(&htim2, arrY, TIM_CHANNEL_1);
     HAL_Delay(1);
 
+    // Bắt đầu di chuyển đồng thời cả 2 trục
     GoLinerX(x);
     GoLinerY(y);
 
+    // Đợi cả 2 trục hoàn thành
     WaitX();
     WaitY();
 }
@@ -682,27 +701,35 @@ void DrawCircle(float r)
 {
     float cx = 4.0f;
     float cy = 4.0f;
+    float step = 0.1f;
 
-    const int N = 360;          // số đoạn
-    const float dT = M_PI / N;
-
-    GoDiagonal(cx + r, cy);
-    WaitX();
-    WaitY();
-
-    for (int i = 1; i <= N; i++)
-    {
-        float t = i * dT;
-        float x = cx + r * cosf(t);
-        float y = cy + r * sinf(t);
-
-//        x = round2(x);
-//        y = round2(y);
-
+    // Cung 1: Phần tư 4 → 1 (0° → 90°)
+    for(float x = cx + r; x >= cx; x -= step) {
+        float y = cy + sqrtf(r*r - (x-cx)*(x-cx));
         GoDiagonal(x, y);
+        HAL_Delay(1);
     }
 
-    GoDiagonal(cx + r, cy);   // 🔒 đóng vòng tuyệt đối
+    // Cung 2: Phần tư 1 → 2 (90° → 180°)
+    for(float x = cx; x >= cx - r; x -= step) {
+        float y = cy + sqrtf(r*r - (x-cx)*(x-cx));
+        GoDiagonal(x, y);
+        HAL_Delay(1);
+    }
+
+    // Cung 3: Phần tư 2 → 3 (180° → 270°)
+    for(float x = cx - r; x <= cx; x += step) {
+        float y = cy - sqrtf(r*r - (x-cx)*(x-cx));
+        GoDiagonal(x, y);
+        HAL_Delay(1);
+    }
+
+    // Cung 4: Phần tư 3 → 4 (270° → 360°)
+    for(float x = cx; x <= cx + r; x += step) {
+        float y = cy - sqrtf(r*r - (x-cx)*(x-cx));
+        GoDiagonal(x, y);
+        HAL_Delay(1);
+    }
 }
 
 
@@ -727,7 +754,6 @@ void DrawStar(){
 }
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance == TIM1 ){
-		x_go++;
 		if(x_go==x_value){
 			HAL_GPIO_WritePin(ENA1_GPIO_Port, ENA1_Pin,SET);
 			HAL_TIM_PWM_Stop_IT(&htim1, TIM_CHANNEL_1);
@@ -736,9 +762,9 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 
 			x_done = 1;
 		}
+		x_go++;
 	}
 	if(htim->Instance == TIM2 ){
-		y_go++;
 		if(y_go==y_value){
 			HAL_GPIO_WritePin(ENA2_GPIO_Port, ENA2_Pin,SET);
 			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
@@ -746,6 +772,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 			PWM_SetARR_Pulse(&htim2, 1000, TIM_CHANNEL_1);
 			y_done = 1;
 		}
+		y_go++;
 	}
 }
 /* USER CODE END 4 */
