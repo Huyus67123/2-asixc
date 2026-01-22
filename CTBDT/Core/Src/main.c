@@ -55,7 +55,16 @@ TIM_HandleTypeDef htim2;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
+//defind struct to manager mode1, mode2, mode3, mode4 using flag
+typedef enum{
+	IDLE = 0,
+	DRAW_CIRCLE,
+	DRAW_SQUARE,
+	DRAW_RECTANGLE,
+	DRAW_START,
+} RobotState;
 
+volatile RobotState current_mode = IDLE;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -462,6 +471,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	}
 	if(GPIO_Pin==GPIO_PIN_7){
 		HAL_GPIO_WritePin(ENA2_GPIO_Port, ENA2_Pin, GPIO_PIN_SET);
+	}
+
+	if(GPIO_Pin == button1_Pin){
+		current_mode = DRAW_CIRCLE;
+	}
+
+	if(GPIO_Pin == button2_Pin){
+		current_mode = DRAW_RECTANGLE;
+	}
+
+	if(GPIO_Pin == button3_Pin){
+		current_mode = DRAW_SQUARE;
+	}
+
+	if(GPIO_Pin == button4_Pin){
+		current_mode = DRAW_START;
 	}
 }
 
