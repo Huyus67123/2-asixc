@@ -1,4 +1,8 @@
 <h1>STM32 2-Axis Drawing Robot (Bare-Metal Firmware)</h1>
+
+<p><img src="https://via.placeholder.com/800x400.png?text=Insert+a+GIF+or+Photo+of+your+robot+working+here" alt="Project Demo"></p>
+<p><i>(Note: Replace the placeholder above with a real GIF or photo of your robot in action)</i></p>
+
 <h2>1. About The Project</h2>
 
 <p>This repository contains the firmware and hardware configurations for a custom-built 2-Axis Drawing Robot. The core system is powered by an STM32F103C8T6 (Blue Pill) microcontroller, programmed entirely in bare-metal C/C++ to ensure maximum performance and precise timing.</p>
@@ -134,6 +138,16 @@
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td><strong><font color="#005cc5">PA9</font></strong></td>
+      <td><strong><font color="#22863a">USART1_TX</font></strong></td>
+      <td>Programming MCU via UART Bootloader (TX)</td>
+    </tr>
+    <tr>
+      <td><strong><font color="#005cc5">PA10</font></strong></td>
+      <td><strong><font color="#22863a">USART1_RX</font></strong></td>
+      <td>Programming MCU via UART Bootloader (RX)</td>
+    </tr>
     <tr>
       <td><strong><font color="#005cc5">PA13</font></strong></td>
       <td><strong><font color="#22863a">SYS_JTMS-SWDIO</font></strong></td>
