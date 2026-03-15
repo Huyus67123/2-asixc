@@ -10,7 +10,7 @@
   <li><strong>Hardware Integration:</strong> Calibrated and integrated stepper motor drivers, rigorously validating torque control logic to maintain system stability under mechanical load.</li>
 </ul>
 
-<p><strong>Tech Stack:</strong> <code>STM32</code> | <code>C/C++</code> | <code>G-code Processing</code> | <code>UART Debugging</code> | <code>Hardware Timers/Interrupts</code></p>
+<p><strong>Tech Stack:</strong> <code>STM32</code> | <code>C/C++</code> | <code>UART Debugging</code> | <code>Hardware Timers/Interrupts</code></p>
 
 <h2>2. Hardware Requirements (BOM)</h2>
 
