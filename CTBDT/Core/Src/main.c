@@ -474,10 +474,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin==StopX_Pin){
-		endX=1;
+		HAL_GPIO_WritePin(ENA1_GPIO_Port, ENA1_Pin, GPIO_PIN_SET);
 	}
 	if(GPIO_Pin==StopY_Pin){
-		endY=1;
+		HAL_GPIO_WritePin(ENA2_GPIO_Port, ENA2_Pin, GPIO_PIN_SET);
 	}
 
 	if(GPIO_Pin == button1_Pin){
